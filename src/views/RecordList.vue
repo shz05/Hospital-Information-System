@@ -4,16 +4,23 @@
       <template #header>
         <div class="card-header">
           <span class="card-title">就诊记录</span>
-          <span class="card-subtitle">共 {{ records.length }} 条记录</span>
+          <span class="card-subtitle">共 {{ filteredRecords.length }} 条记录</span>
+          <el-input
+            v-model="keyword"
+            class="search-input"
+            placeholder="搜索患者姓名 / 科室 / 诊断"
+            clearable
+            :prefix-icon="Search"
+          />
         </div>
       </template>
 
       <el-table
-        :data="records"
+        :data="filteredRecords"
         border
         stripe
         style="width: 100%"
-        empty-text="暂无就诊记录"
+        empty-text="未找到相关就诊记录"
         @row-click="handleRowClick"
       >
         <el-table-column prop="name" label="患者姓名" min-width="120" />
@@ -26,12 +33,25 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Search } from '@element-plus/icons-vue'
 import { getAllRecords } from '../mock/records'
 
 const router = useRouter()
 const records = ref(getAllRecords())
+const keyword = ref('')
+
+const filteredRecords = computed(() => {
+  const kw = keyword.value.trim()
+  if (!kw) return records.value
+  return records.value.filter(
+    (item) =>
+      item.name.includes(kw) ||
+      item.department.includes(kw) ||
+      item.diagnosis.includes(kw)
+  )
+})
 
 function handleRowClick(row) {
   router.push(`/records/${row.id}`)
@@ -45,8 +65,13 @@ function handleRowClick(row) {
 
 .card-header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 12px;
+}
+
+.search-input {
+  width: 280px;
+  margin-left: auto;
 }
 
 .card-title {
