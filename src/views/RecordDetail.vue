@@ -39,14 +39,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import { getRecordById } from '../mock/records'
 
 const route = useRoute()
 const router = useRouter()
-const record = ref(getRecordById(route.params.id))
+const record = computed(() => getRecordById(route.params.id))
 
 function goBack() {
   router.push('/records')
